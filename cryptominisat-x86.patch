@@ -1,0 +1,12 @@
+diff -up cryptominisat-2.9.1/Solver/Main.cpp.x86 cryptominisat-2.9.1/Solver/Main.cpp
+--- cryptominisat-2.9.1/Solver/Main.cpp.x86	2011-12-19 11:38:13.000000000 +0100
++++ cryptominisat-2.9.1/Solver/Main.cpp	2011-12-19 11:38:40.000000000 +0100
+@@ -645,7 +645,7 @@ FILE* Main::openOutputFile()
+ 
+ void Main::setDoublePrecision(const uint32_t verbosity)
+ {
+-    #if defined(__linux__)
++    #if defined(__linux__) && (defined(__i386__) || defined(__x86_64__))
+     fpu_control_t oldcw, newcw;
+     _FPU_GETCW(oldcw);
+     newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE;

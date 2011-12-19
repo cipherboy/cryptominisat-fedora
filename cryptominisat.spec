@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        SAT solver
 
 # Some source files were borrowed from minisat2, which is MIT-licensed.
@@ -15,6 +15,8 @@ Source1:        %{name}.1
 # This patch was sent upstream 7 Dec 2011.  It converts calls to exit() inside
 # the library into either boolean return codes or exceptions.
 Patch0:         %{name}-exit.patch
+# FPU handling is x86 specific
+Patch1:         %{name}-x86.patch
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -46,6 +48,7 @@ The %{name} library.
 %prep
 %setup -q
 %patch0
+%patch1 -p1
 
 %build
 %configure --disable-static
@@ -66,7 +69,7 @@ sed "s/@VERSION@/%{version}/" %{SOURCE1} > $RPM_BUILD_ROOT%{_mandir}/man1/%{name
 %check
 cd tests
 set +e
-../cryptominisat --nosolprint --verbosity=1 AProVE09-12.cnf.gz
+LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 AProVE09-12.cnf.gz
 [ $? = 10 ]
 
 %post -p /sbin/ldconfig
@@ -86,5 +89,9 @@ set +e
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Dec 19 2011 Dan Horák <dan[at]danny.cz> - 2.9.1-2
+- FPU handling is x86 specific
+- set library path so the test is run
+
 * Wed Dec  7 2011 Jerry James <loganjerry@gmail.com> - 2.9.1-1
 - Initial RPM
