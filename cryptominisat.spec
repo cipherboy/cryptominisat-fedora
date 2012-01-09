@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        SAT solver
 
 # Some source files were borrowed from minisat2, which is MIT-licensed.
@@ -89,6 +89,9 @@ LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 APro
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Jan  9 2012 Jerry James <loganjerry@gmail.com> - 2.9.1-3
+- Rebuild for GCC 4.7
+
 * Mon Dec 19 2011 Dan Horák <dan[at]danny.cz> - 2.9.1-2
 - FPU handling is x86 specific
 - set library path so the test is run
