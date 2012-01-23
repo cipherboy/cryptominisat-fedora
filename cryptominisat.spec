@@ -1,6 +1,6 @@
 Name:           cryptominisat
-Version:        2.9.1
-Release:        3%{?dist}
+Version:        2.9.2
+Release:        1%{?dist}
 Summary:        SAT solver
 
 # Some source files were borrowed from minisat2, which is MIT-licensed.
@@ -8,15 +8,7 @@ Summary:        SAT solver
 # Original sources for this project are licensed GPL v3 or later.
 License:        GPLv3+
 URL:            http://www.msoos.org/cryptominisat2
-Source0:        https://gforge.inria.fr/frs/download.php/28579/%{name}-%{version}.tar.gz
-# Man page written by Jerry James, using text found in the sources.
-# The man page therefore has the same copyright and license as the sources.
-Source1:        %{name}.1
-# This patch was sent upstream 7 Dec 2011.  It converts calls to exit() inside
-# the library into either boolean return codes or exceptions.
-Patch0:         %{name}-exit.patch
-# FPU handling is x86 specific
-Patch1:         %{name}-x86.patch
+Source0:        https://gforge.inria.fr/frs/download.php/30138/%{name}-%{version}.tar.gz
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -47,8 +39,6 @@ The %{name} library.
 
 %prep
 %setup -q
-%patch0
-%patch1 -p1
 
 %build
 %configure --disable-static
@@ -62,15 +52,11 @@ make %{?_smp_mflags}
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
-# Install the man page
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-sed "s/@VERSION@/%{version}/" %{SOURCE1} > $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
-
-%check
-cd tests
-set +e
-LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 AProVE09-12.cnf.gz
-[ $? = 10 ]
+# %%check
+# cd tests
+# set +e
+# LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 AProVE09-12.cnf.gz
+# [ $? = 10 ]
 
 %post -p /sbin/ldconfig
 
@@ -89,6 +75,12 @@ LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 APro
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Jan 23 2012 Jerry James <loganjerry@gmail.com> - 2.9.2-1
+- New upstream version
+- Man page is now upstream
+- All patches have been applied upstream
+- Tests have been removed from the source distribution
+
 * Mon Jan  9 2012 Jerry James <loganjerry@gmail.com> - 2.9.1-3
 - Rebuild for GCC 4.7
 
