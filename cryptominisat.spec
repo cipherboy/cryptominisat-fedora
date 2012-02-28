@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        SAT solver
 
 # Some source files were borrowed from minisat2, which is MIT-licensed.
@@ -75,6 +75,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.2-2
+- Rebuilt for c++ ABI breakage
+
 * Mon Jan 23 2012 Jerry James <loganjerry@gmail.com> - 2.9.2-1
 - New upstream version
 - Man page is now upstream
