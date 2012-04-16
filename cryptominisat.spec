@@ -1,6 +1,6 @@
 Name:           cryptominisat
-Version:        2.9.2
-Release:        2%{?dist}
+Version:        2.9.3
+Release:        1%{?dist}
 Summary:        SAT solver
 
 # Some source files were borrowed from minisat2, which is MIT-licensed.
@@ -8,7 +8,7 @@ Summary:        SAT solver
 # Original sources for this project are licensed GPL v3 or later.
 License:        GPLv3+
 URL:            http://www.msoos.org/cryptominisat2
-Source0:        https://gforge.inria.fr/frs/download.php/30138/%{name}-%{version}.tar.gz
+Source0:        https://gforge.inria.fr/frs/download.php/30588/%{name}-%{version}.tar.gz
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -52,12 +52,6 @@ make %{?_smp_mflags}
 make install DESTDIR=$RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
-# %%check
-# cd tests
-# set +e
-# LD_LIBRARY_PATH=../Solver/.libs ../cryptominisat --nosolprint --verbosity=1 AProVE09-12.cnf.gz
-# [ $? = 10 ]
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -75,6 +69,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Apr 16 2012 Jerry James <loganjerry@gmail.com> - 2.9.3-1
+- New upstream version
+
 * Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.2-2
 - Rebuilt for c++ ABI breakage
 
