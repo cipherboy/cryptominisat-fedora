@@ -1,14 +1,13 @@
 Name:           cryptominisat
-Version:        2.9.3
-Release:        2%{?dist}
+Version:        2.9.5
+Release:        1%{?dist}
 Summary:        SAT solver
 
-# Some source files were borrowed from minisat2, which is MIT-licensed.
 # The Mersenne Twister implementation is BSD-licensed.
-# Original sources for this project are licensed GPL v3 or later.
-License:        GPLv3+
-URL:            http://www.msoos.org/cryptominisat2
-Source0:        https://gforge.inria.fr/frs/download.php/30588/%{name}-%{version}.tar.gz
+# All other files are MIT-licensed.
+License:        MIT
+URL:            http://www.msoos.org/cryptominisat2/
+Source0:        https://gforge.inria.fr/frs/download.php/31107/cmsat-%{version}.tar.gz
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -38,14 +37,14 @@ Summary:        Cryptominisat library
 The %{name} library.
 
 %prep
-%setup -q
+%setup -q -n cmsat-%{version}
 
 %build
 %configure --disable-static
 sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     -i libtool
-sed -i 's|^LIBS =.*|LIBS = -lz -lgomp|' Solver/Makefile
+sed -i 's|^LIBS =.*|LIBS = -lz -lgomp|' cmsat/Makefile
 make %{?_smp_mflags}
 
 %install
@@ -61,14 +60,18 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_mandir}/man1/%{name}*
 
 %files devel
-%{_includedir}/%{name}/
+%{_includedir}/cmsat/
 %{_libdir}/lib%{name}.so
 
 %files libs
-%doc AUTHORS LICENSE-GPL LICENSE-MIT NEWS README TODO
+%doc AUTHORS LICENSE-MIT NEWS README TODO
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Aug  6 2012 Jerry James <loganjerry@gmail.com> - 2.9.5-1
+- New upstream release
+- Project files now carry the MIT license
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
