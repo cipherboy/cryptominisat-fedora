@@ -1,13 +1,13 @@
 Name:           cryptominisat
-Version:        2.9.5
-Release:        2%{?dist}
+Version:        2.9.6
+Release:        1%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
 # All other files are MIT-licensed.
 License:        MIT
 URL:            http://www.msoos.org/cryptominisat2/
-Source0:        https://gforge.inria.fr/frs/download.php/31107/cmsat-%{version}.tar.gz
+Source0:        https://gforge.inria.fr/frs/download.php/32160/cmsat-%{version}.tar.gz
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -68,6 +68,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Mon Mar 11 2013 Jerry James <loganjerry@gmail.com> - 2.9.6-1
+- New upstream release
+
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
