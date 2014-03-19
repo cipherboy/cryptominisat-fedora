@@ -1,5 +1,5 @@
 Name:           cryptominisat
-Version:        2.9.8
+Version:        2.9.9
 Release:        1%{?dist}
 Summary:        SAT solver
 
@@ -7,7 +7,7 @@ Summary:        SAT solver
 # All other files are MIT-licensed.
 License:        MIT
 URL:            http://www.msoos.org/cryptominisat2/
-Source0:        https://gforge.inria.fr/frs/download.php/32925/cmsat-%{version}.tar.gz
+Source0:        https://gforge.inria.fr/frs/download.php/33402/cmsat-%{version}.tar.gz
 
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -68,6 +68,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Tue Mar 18 2014 Jerry James <loganjerry@gmail.com> - 2.9.9-1
+- New upstream release
+
 * Mon Sep 23 2013 Jerry James <loganjerry@gmail.com> - 2.9.8-1
 - New upstream release
 
