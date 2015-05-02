@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
@@ -69,6 +69,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 2.9.9-5
+- Rebuilt for GCC 5 C++11 ABI change
+
 * Wed Feb 11 2015 Jerry James <loganjerry@gmail.com> - 2.9.9-4
 - Use license macro
 
