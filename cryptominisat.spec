@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
@@ -69,6 +69,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 2.9.9-5
 - Rebuilt for GCC 5 C++11 ABI change
 
