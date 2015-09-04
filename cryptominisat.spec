@@ -1,14 +1,17 @@
 Name:           cryptominisat
-Version:        2.9.9
-Release:        6%{?dist}
+Version:        2.9.10
+Release:        1%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
 # All other files are MIT-licensed.
 License:        MIT
 URL:            http://www.msoos.org/cryptominisat2/
-Source0:        https://gforge.inria.fr/frs/download.php/33402/cmsat-%{version}.tar.gz
+Source0:        https://github.com/msoos/cryptominisat/archive/%{name}-%{version}.zip
 
+BuildRequires:  libtool
+BuildRequires:  mariadb-devel
+BuildRequires:  perl
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -26,6 +29,8 @@ researchers and industry.
 %package devel
 Summary:        Header files for developing with %{name}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       mariadb-devel%{?_isa}
+Requires:       zlib-devel%{?_isa}
 
 %description devel
 Header files for developing applications that use %{name}.
@@ -37,19 +42,37 @@ Summary:        Cryptominisat library
 The %{name} library.
 
 %prep
-%setup -q -n cmsat-%{version}
+%setup -q -n %{name}-%{name}-%{version}
+
+# Fix version number
+sed -i 's/2\.9\.9/%{version}/' configure.in
+
+# Fix version number and output directory in library documentation
+sed -e 's/2\.6\.0/%{version}/' \
+    -e 's,/home/soos.*cryptominisat,'$PWD, \
+    -i Doxyfile
+
+# Generate the configure script
+autoreconf -fi
 
 %build
+export CPPFLAGS="-DHAVE_MYSQL -DCMSAT_HAVE_MYSQL"
+export LDFLAGS="-L%{_libdir}/mysql"
+export LIBS="-lmysqlclient"
 %configure --disable-static
+
+# Eliminate hardcoded rpaths
 sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     -i libtool
-sed -i 's|^LIBS =.*|LIBS = -lz -lgomp|' cmsat/Makefile
+
 make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+make install DESTDIR=%{buildroot}
+
+# We don't want the libtool files
+rm -f %{buildroot}%{_libdir}/*.la
 
 %post -p /sbin/ldconfig
 
@@ -69,6 +92,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Fri Sep  4 2015 Jerry James <loganjerry@gmail.com> - 2.9.10-1
+- New upstream release
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.9.9-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
