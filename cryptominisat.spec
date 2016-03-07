@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
@@ -74,9 +74,9 @@ make install DESTDIR=%{buildroot}
 # We don't want the libtool files
 rm -f %{buildroot}%{_libdir}/*.la
 
-%post -p /sbin/ldconfig
+%post libs -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
 
 %files
 %{_bindir}/%{name}
@@ -92,6 +92,9 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Sat Mar  5 2016 Jerry James <loganjerry@gmail.com> - 2.9.10-3
+- post/postun scripts are for libs, not the main package
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.10-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
