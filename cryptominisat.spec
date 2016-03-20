@@ -1,14 +1,15 @@
 Name:           cryptominisat
-Version:        2.9.10
-Release:        3%{?dist}
+Version:        2.9.11
+Release:        1%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
 # All other files are MIT-licensed.
 License:        MIT
 URL:            http://www.msoos.org/cryptominisat2/
-Source0:        https://github.com/msoos/cryptominisat/archive/%{name}-%{version}.zip
+Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
 
+BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  mariadb-devel
 BuildRequires:  perl
@@ -42,10 +43,7 @@ Summary:        Cryptominisat library
 The %{name} library.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
-
-# Fix version number
-sed -i 's/2\.9\.9/%{version}/' configure.in
+%setup -q
 
 # Fix version number and output directory in library documentation
 sed -e 's/2\.6\.0/%{version}/' \
@@ -92,6 +90,9 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Sat Mar 19 2016 Jerry James <loganjerry@gmail.com> - 2.9.11-1
+- New upstream release
+
 * Sat Mar  5 2016 Jerry James <loganjerry@gmail.com> - 2.9.10-3
 - post/postun scripts are for libs, not the main package
 
