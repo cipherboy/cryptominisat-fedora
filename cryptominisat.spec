@@ -12,7 +12,7 @@ Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  libtool
 BuildRequires:  mariadb-devel
-BuildRequires:  perl
+BuildRequires:  perl-interpreter
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
