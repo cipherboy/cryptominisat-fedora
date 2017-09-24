@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        2.9.11
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        SAT solver
 
 # The Mersenne Twister implementation is BSD-licensed.
@@ -11,7 +11,7 @@ Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  libtool
-BuildRequires:  mariadb-devel
+BuildRequires:  mariadb-connector-c-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -30,7 +30,7 @@ researchers and industry.
 %package devel
 Summary:        Header files for developing with %{name}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       mariadb-devel%{?_isa}
+Requires:       mariadb-connector-c-devel%{?_isa}
 Requires:       zlib-devel%{?_isa}
 
 %description devel
@@ -55,7 +55,7 @@ autoreconf -fi
 
 %build
 export CPPFLAGS="-DHAVE_MYSQL -DCMSAT_HAVE_MYSQL"
-export LDFLAGS="-L%{_libdir}/mysql"
+export LDFLAGS="-L%{_libdir}/mariadb"
 export LIBS="-lmysqlclient"
 %configure --disable-static
 
@@ -90,6 +90,9 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_libdir}/lib%{name}-%{version}.so
 
 %changelog
+* Sat Sep 23 2017 Jerry James <loganjerry@gmail.com> - 2.9.11-6
+- Update the mariadb BR (bz 1493618)
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.11-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
