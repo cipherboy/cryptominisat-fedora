@@ -1,0 +1,504 @@
+.TH "CRYPTOMINISAT" "1" "@VERSION@" "Mate Soos" "User Commands"
+.SH "NAME"
+cryptominisat \- conflict-driven SAT solver
+.SH "SYNOPSIS"
+.B cryptominisat
+[\fIOPTIONS\fP] <\fIinput\-files\fP>
+.SH "DESCRIPTION"
+.PP
+CryptoMiniSat is a SAT solver, solving problems given in CNF, or conjunctive
+normal form. CryptoMiniSat retains much of the API of MiniSat, but
+offers more versatility and better speed on many problems.
+
+The program is a classical conflict-driven solver, with variable activities,
+clause learning and clause deletion. It however incorporates a number of
+advanced CNF simplification functionalities which should help the speed of
+solving. Further, it incorporates some advanced memory-management features
+that should help in getting the most out of modern CPU caches.
+
+The input format is that of DIMACS CNF, i.e. a header of the form
+
+p cnf VARS CLAUSES
+
+where VARS is the number of variables, and CLAUSES is the number of clauses in
+the problem. It then lists the set of clauses such as:
+
+1 -2 0
+
+which is equivalent to the 2-long clause "v1 OR NOT v2 = TRUE"
+
+.SH "OPTIONS"
+.TP
+\fB\-h,\-\-help\fP
+Print help text.
+.TP
+\fB\-v,\-\-version\fP
+Print cryptominisat's version number.
+.TP
+\fB\-\-input\fP = <\fIfile1\fP,\fIfile2\fP,...>
+Specify the file(s) to read.
+.TP
+\fB\-r,\-\-random\fP = <\fIseed\fP> [0 - 2^32-1]
+Sets the random seed, used for picking decision variables (default = 0).
+.TP
+\fB\-t,\-\-threads\fP = <\fInum\fP> [1..]
+Number of threads (default is 1).
+.TP
+\fB\-\-sync\fP = <\fInum\fP>
+Sync threads every \fInum\fP conflicts (default = 6000).
+.TP
+\fB\-\-maxtime\fP = <\fInum\fP>
+Stop solving after this much time, print stats and exit.
+.TP
+\fB\-\-maxconfl\fP = <\fInum\fP>
+Stop solving after this many conflicts, print stats and exit.
+.TP
+\fB\-\-occsimp\fP = \fI{0,1}\fP
+Perform occurrence-list-based optimizations, such as variable eliminiation,
+subsumption, and bounded variable addition.  Default is 1.
+.TP
+\fB\-\-clbtwsimp\fP = <\fInum\fP>
+Perform this many cleaning iterations between simplification rounds
+(default = 2).
+.TP
+\fB\-d,\-\-drup\fP = \fI{0,1}\fP
+Put DRUP verification information into this file.
+.TP
+\fB\-\-drupexistscheck\fP = \fI{0,1}\fP
+Check if the DRUP file provided already exists (default = 1).
+.TP
+\fB\-\-drupdebug\fP = \fI{0,1}\fP
+Output DRUP verification to the console.  This is helpful to see where DRUP
+fails.  Use in conjunction with \fB--verb 20\fP.
+.SS "RESTART"
+.TP
+\fB\-\-agilg\fP = <\fInum\fP>
+See paper by Armin Biere on agilities.
+.TP
+\fB\-\-restart\fP = \fI{geom,agility,glue,glueagility}\fP
+Choose the restart strategy to follow.
+.TP
+\fB\-\-agillim\fP = <\fInum\fP>
+The agility below which the agility is considered too low (default = 0.03).
+.TP
+\fB\-\-agilviollim\fP = <\fInum\fP>
+The number of agility violations over which to demand a restart (default = 20).
+.TP
+\fB\-\-gluehist\fP = <\fInum\fP>
+The size of the moving window for short term glue history of redundant
+clauses (default = 100).  If higher, the minimal number of conflicts between
+restarts is longer.
+.TP
+\fB\-\-blkrest\fP = \fI{0,1}\fP
+Perform blocking restarts as per Glucose 3.0 (default = 1).
+.TP
+\fB\-\-blkrestlen\fP = <\fInum\fP>
+The length of the long term trail size for blocking restart (default = 5000).
+.TP
+\fB\-\-blkrestmultip\fP = <\fInum\fP>
+Multiplier used for blocking restart cut-off, called "R" in Glucose 3.0
+(default = 1.4).
+.SS "PRINTING"
+.TP
+\fB\-\-verb\fP = <\fInum\fP> [0-10]
+Verbosity of the solver (default = 2).  Verbosity 0 only prints the results.
+.TP
+\fB\-\-verbstat\fP = \fI{0,1}\fP
+Turns off verbose stats if needed (default = 1).
+.TP
+\fB\-\-printfull\fP = \fI{0,1}\fP
+Print more thorough, but different, stats (default = 0).
+.TP
+\fB\-s,\-\-printsol\fP = \fI{0,1}\fP
+Print the satisfying assignment if the solution is SAT (default = 1).
+.TP
+\fB\-\-printtrail\fP = <\fInum\fP>
+Print the longest decision trail of the last N conflicts; if 0, the decision
+trail is not printed (default = 0).
+.TP
+\fB\-\-printbest\fP = <\fInum\fP>
+Print the best N irredundant longer-than-3 learnt clauses; if 0, nothing is
+printed (default = 0).
+.TP
+\fB\-\-printtimes\fP = \fI{0,1}\fP
+Print the time taken for each simplification run; if 0, nothing is printed,
+which makes logs easier to compare (default = 1).
+.SS "PROPAGATION"
+.TP
+\fB\-\-updateglue\fP = \fI{0,1}\fP
+Update glues while propagating (default = 1).
+.TP
+\fB\-\-lhbr\fP = \fI{0,1}\fP
+Perform lazy hyper-binary resolution while propagating (default = 0).
+.TP
+\fB\-\-binpri\fP = \fI{0,1}\fP
+Propagated binary clauses are strictly first (default = 0).
+.TP
+\fB\-\-otfhyper\fP = \fI{0,1}\fP
+Perform hyper-binary resolution at decision level 1 after every restart and
+during probing (default = 1).
+.SS "REDUNDANT CLAUSE REMOVAL"
+.TP
+\fB\-\-ltclean\fP = <\fInum\fP> [0-1]
+Remove at least this ratio of redundant clauses when doing redundant clause
+cleaning (default = 0.5).
+.TP
+\fB\-\-clean\fP = \fI{size,glue,activity,prconf,confdep}\fP
+Metric used to clean clauses (default = prconf).  Use "prconf" for the sum of
+propagations and conflicts.  Use "confdep" for (propagations + conflicts) /
+(depth at which they were caused).
+.TP
+\fB\-\-noremfreshgl2\fP = \fI{0,1}\fP
+Don't remove glue 2 clauses that are fresh (default = 0).
+.TP
+\fB\-\-cleanconflmult\fP = <\fInum\fP>
+If propagations and conflicts are used to clean, the value by which conflicts
+are multiplied relative to propagations (default = 1).  Conflicts are much
+rarer, but maybe more useful.
+.TP
+\fB\-\-lockuip\fP = <\fInum\fP>
+The number of clauses to lock into the database per cleaning based on UIP usage
+(default = 500).
+.TP
+\fB\-\-locktop\fP = <\fInum\fP>
+The number of clauses to lock into the database per cleaning based on the best
+uncleaned clauses as per the selected heuristic (default = 0).
+.TP
+\fB\-\-perfmult\fP = <\fInum\fP>
+Value by which to multiply clause performance values after every clause cleaning
+(default = 0).
+.TP
+\fB\-\-clearstat\fP = \fI{0,1}\fP
+Clear clause statistics data of each clause after clause cleaning (default = 1).
+.TP
+\fB\-\-startclean\fP = <\fInum\fP>
+Clean the first time after this many conflicts (default = 10000).
+.TP
+\fB\-\-incclean\fP = <\fInum\fP>
+Clean increment cleaning by this factor for the next cleaning (default = 1.1).
+.TP
+\fB\-\-maxredratio\fP = <\fInum\fP>
+Never have more than N * (irred_clauses) redundant clauses (default = 10).
+.SS "VARIABLE BRANCHING"
+.TP
+\fB\-\-vincmult\fP = <\fInum\fP>
+Variable activity increase multipler (default = 11).
+.TP
+\fB\-\-vincdiv\fP = <\fInum\fP>
+Variable activity increase divider (default = 10); it \fBmust\fP be smaller
+than the multiplier.
+.TP
+\fB\-\-vincvary\fP = <\fInum\fP>
+Variable activity divider and multiplier are both changed +/- this amount,
+randomly, in sync (default = 0).
+.TP
+\fB\-\-vincstart\fP = <\fInum\fP>
+Variable activity increase stars with this value.  Make sure that this,
+multiplied by the multiplier and divided by the divider, is larger than itself
+(default = 128).
+.TP
+\fB\-\-freq\fP = <\fInum\fP> [0-1]
+Frequency of picking decision variables at random (default = 0).
+.TP
+\fB\-\-dompickf\fP = <\fInum\fP>
+Use the dominating literal once in every N when picking decision literal
+(default = 400).
+.TP
+\fB\-\-morebump\fP = \fI{0,1}\fP
+Bump variables' activities based on the glue of redundant clauses there are in
+during UIP generation, as per Glucose (default = 1).
+.SS "VARIABLE POLARITY"
+.TP
+\fB\-\-polar\fP = \fI{true,false,rnd,auto}\fP
+Selects the polarity mode (default = auto).  True selects only positive
+polarity when branching.  False selects only negative polarity when branching.
+Auto selects the last polarity used (also called 'caching').
+.TP
+\fB\-\-calcpolar1st\fP = \fI{0,1}\fP
+Calculate the polarity of variables based on their occurrences at startup of
+solve() (default = 1).
+.TP
+\fB\-\-calcpolarall\fP = \fI{0,1}\fP
+Calculate the polarity of variables based on their occurrences at startup and
+after every simplification (default = 1).
+.SS "CONFLICT"
+.TP
+\fB\-\-recur\fP = \fI{0,1}\fP
+Perform recursive minimisation.
+.TP
+\fB\-\-moreminim\fP = \fI{0,1}\fP
+Perform strong minimisation at conflict gen.
+.TP
+\fB\-\-moreminimcache\fP = <\fInum\fP>
+Timeout in microsteps for each more minimisation with cache (default = 200).
+Only active if 'moreminim' is on.
+.TP
+\fB\-\-moreminimbin\fP = <\fInum\fP>
+Timeout in microsteps for each more minimisation with binary clauses
+(default = 100).  Only active if 'moreminim' is on.
+.TP
+\fB\-\-alwaysmoremin\fP = \fI{0,1}\fP
+Always strong-minimise clauses.
+.TP
+\fB\-\-otfsubsume\fP = \fI{0,1}\fP
+Perform on-the-fly subsumption.
+.TP
+\fB\-\-rewardotfsubsume\fP = <\fInum\fP>
+Reward with this many propagations and conflicts a clause that has been
+shortened with on-the-fly subsumption (default = 3).
+.TP
+\fB\-\-printimpldot\fP = \fI{0,1}\fP
+Print implication graph DOT files, for input into graphviz.
+.SS "ITERATIVE SOLVE"
+.TP
+\fB\-\-maxsol\fP = <\fInum\fP>
+Search for the given number of solutions (default = 1).
+.TP
+\fB\-\-dumpred\fP = <\fIfilename\fP>
+If stopped, dump redundant clauses here.
+.TP
+\fB\-\-maxdump\fP = <\fInum\fP>
+Maximum length of redundant clauses to dump.
+.TP
+\fB\-\-dumpirred\fP = <\fIfilename\fP>
+If stopped, dump irredundant original problems here.
+.TP
+\fB\-\-debuglib\fP
+Solve at specific \fBc Solver::solve()\fP points in the CNF file.  Used to
+debug file generated by Solver's \fBneedLibraryCNFFile()\fP function.
+.TP
+\fB\-\-dumpresult\fP = <\fIfilename\fP>
+Write result(s) to this file.
+.SS "PROBING"
+.TP
+\fB\-\-bothprop\fP = \fI{0,1}\fP
+Do propagations solely to propagate the same value twice (default = 1).
+.TP
+\fB\-\-probe\fP = \fI{0,1}\fP
+Carry out probing (default = 1).
+.TP
+\fB\-\-probemaxm\fP = <\fInum\fP>
+Time in mega-bogoprops to perform probing (default = 1900).
+.TP
+\fB\-\-transred\fP = \fI{0,1}\fP
+Remove useless binary clauses; i.e., transitive reduction (default = 1).
+.SS "STAMPING"
+.TP
+\fB\-\-stamp\fP = \fI{0,1}\fP
+Use time stamping as per the Heule, Javisalo, and Biere paper (default = 1).
+.TP
+\fB\-\-cache\fP = \fI{0,1}\fP
+Use an implication cache (default = 1).  This option may use a lot of memory.
+.TP
+\fB\-\-cachesize\fP = <\fInum\fP>
+Maximum size of the implication cache in MB (default = 2048).  The cache may
+temporarily use more memory, but will be deleted and disabled if this limit is
+reached.
+.TP
+\fB\-\-calcreach\fP = \fI{0,1}\fP
+Calculate literal reachability (default = 1).
+.TP
+\fB\-\-cachecutoff\fP = <\fInum\fP>
+If the number of literals propagated by a literal is greater than this value,
+the literal is not included in the implication cache (default = 2000).
+.SS "SIMPLIFICATION"
+.TP
+\fB\-\-schedsimp\fP = \fI{0,1}\fP
+Perform regular simplification rounds (default = 1).
+.TP
+\fB\-\-presimp\fP = \fI{0,1}\fP
+Perform simplification at the very start (default = 0).
+.TP
+\fB\-\-varelim\fP = \fI{0,1}\fP
+Perform variable elimination as per Een and Biere (default = 1).
+.TP
+\fB\-\-emptyelim\fP = \fI{0,1}\fP
+Perform empty resolvent elimination using the bit-map trick (default = 1).
+.TP
+\fB\-\-elimstrgy\fP = \fI{heuristic,calculate}\fP
+The strategy used to sort variable elimination order (default = heuristic).
+The heuristic strategy uses intelligent guessing.  The calculate strategy uses
+exact calculation.
+.TP
+\fB\-\-elimcplxupd\fP = \fI{0,1}\fP
+Update estimated elimination complexity on-the-fly while eliminating
+(default = 1).
+.TP
+\fB\-\-elimcoststrategy\fP = <\fInum\fP> [0-1]
+How the simple guessing strategy is calculated.
+.TP
+\fB\-\-strengthen\fP = \fI{0,1}\fP
+Perform clause contraction through resolution (default = 1).
+.TP
+\fB\-\-bva\fP = \fI{0,1}\fP
+Perform bounded variable addition (default = 1).
+.TP
+\fB\-\-bvalim\fP = <\fInum\fP>
+Maximum number of variables to add by bounded variable addition per call
+(default = 150000).
+.TP
+\fB\-\-bva2lit\fP = \fI{0,1}\fP
+Bounded variable addition with 2-literal difference hack, too (default = 1).
+Beware, this reduces the effectiveness of 1-literal difference.
+.TP
+\fB\-\-noextbinsubs\fP = \fI{0,1}\fP
+No extended subsumption with binary clauses (default = 1).
+.TP
+\fB\-\-eratio\fP = <\fInum\fP> [0-1]
+Eliminate this ratio of free variables at most per variable elimination
+iteration (default = 0.12).
+.TP
+\fB\-\-skipresol\fP = \fI{0,1}\fP
+Skip BVE resolvents in case they belong to a gate (default = 0).
+.TP
+\fB\-\-occredmax\fP = <\fInum\fP>
+Don't add any redundant clauses larger than this to the occur list
+(default = 200).
+.TP
+\fB\-\-occirredmaxmb\fP = <\fInum\fP>
+Don't allow the irredundant occur size to be more than this many MB
+(default = 800).
+.TP
+\fB\-\-occredmaxmb\fP = <\fInum\fP>
+Don't allow the redundant occur size to be more than this many MB
+(default = 800).
+.SS "EQUIVALENT LITERAL"
+.TP
+\fB\-\-scc\fP = \fI{0,1}\fP
+Find equivalent literals through SCC and replace them (default = 1).
+.TP
+\fB\-\-extscc\fP = \fI{0,1}\fP
+Perform SCC using cache (default = 1).
+.TP
+\fB\-\-sccperc\fP = <\fInum\fP> [0-1]
+Perform SCC only if the number of new binary clauses is at least this
+percentage of the number of free variables (default = 0.02).
+.SS "COMPONENT"
+.TP
+\fB\-\-findcomp\fP = \fI{0,1}\fP
+Find components, but do not treat them (default = 0).
+.TP
+\fB\-\-comps\fP = \fI{0,1}\fP
+Perform component-finding and separate handling (default = 1).
+.TP
+\fB\-\-compsfrom\fP = <\fInum\fP>
+Do component finding only after this many simplification rounds (default = 0).
+.TP
+\fB\-\-compsvar\fP = <\fInum\fP>
+Only use components when the number of variables is below this limit
+(default = 1000000).
+.TP
+\fB\-\-compslimit\fP = <\fInum\fP>
+Limit how much time is spent in component finding (default = 500).
+.SS "XOR-RELATED"
+.TP
+\fB\-\-xor\fP = \fI{0,1}\fP
+Discover long XORs (default = 1).
+.TP
+\fB\-\-xorcache\fP = \fI{0,1}\fP
+Use cache when finding XORs (default = 0).  This finds a \fIlot\fP more XORs,
+but takes a lot more time.
+.TP
+\fB\-\-echelonxor\fP = \fI{0,1}\fP
+Extract data from XORs through echelonization \fIat the top level only\fP
+(default = 1).
+.TP
+\fB\-\-maxxormat\fP = <\fInum\fP>
+The maximum matrix size (i.e., number of elements) that we should try to
+echelonize (default = 10000000).
+.SS "GATE-RELATED"
+.TP
+\fB\-\-gates\fP = \fI{0,1}\fP
+Find gates (default = 1).  Disables all other gate-related sub-options.
+.TP
+\fB\-\-gorshort\fP = \fI{0,1}\fP
+Shorten clauses with OR gates (default = 1).
+.TP
+\fB\-\-gandrem\fP = \fI{0,1}\fP
+Remove clauses with AND gates (default = 1).
+.TP
+\fB\-\-gateeqlit\fP = \fI{0,1}\fP
+Find equivalent literals using gates (default = 1).
+.TP
+\fB\-\-printgatedot\fP = \fI{0,1}\fP
+Print gate structure regularly to the file 'gatesX.dot' (default = 0).
+.SS "SQL"
+.TP
+\fB\-\-sql\fP = \fI{0,1,2}\fP
+Write to SQL (default = 1).  0 means do not attempt to write to the database.
+1 means to try to write to the database, but continue if the attempt fails.  2
+means to abort if the database cannot be written.
+.TP
+\fB\-\-topnvars\fP = <\fInum\fP>
+At every restart, dump data about the top N variables (default = 0).  If set
+to 0, nothing is dumped.
+.TP
+\fB\-\-dumptreevar\fP = \fI{0,1}\fP
+Dump variance stats of the variables' decision and trail depths (default = 0).
+.TP
+\fB\-\-sqluser\fP = <\fIusername\fP>
+The SQL user to connect with (default = cmsat_solver).
+.TP
+\fB\-\-sqlpass\fP = <\fIpassword\fP>
+The SQL password to connect with.
+.TP
+\fB\-\-sqldb\fP = <\fIdatabase\fP>
+The SQL database name (default = cmsat).  The default is used by the PHP
+system, so it is highly recommended.
+.TP
+\fB\-\-sqlserver\fP = <\fIhostname\fP>
+The SQL server hostname or IP address (default = localhost).
+.SS "MISCELLANEOUS"
+.TP
+\fB\-\-vivif\fP = \fI{0,1}\fP
+Regularly execute clause vivification (default = 1).
+.TP
+\fB\-\-viviflongmaxm\fP = <\fInum\fP>
+Maximum time in mega-bogoprops to spend on vivifying long irreducible clauses
+by enqueueing and propagating (default = 20).
+.TP
+\fB\-\-viviffastmaxm\fP = <\fInum\fP>
+Maximum time in mega-bogoprops to spend on vivifying long irreducible clauses
+through watches, cache and stamps (default = 400).
+.TP
+\fB\-\-sortwatched\fP = \fI{0,1}\fP
+Sort watches according to size (default = 1).
+.TP
+\fB\-\-renumber\fP = \fI{0,1}\fP
+Renumber variables to increase CPU cache efficiency (default = 1).
+.TP
+\fB\-\-savemem\fP = \fI{0,1}\fP
+Save memory by deallocating variable space after renumbering (default = 1).
+This only works if renumbering is active.
+.TP
+\fB\-\-implicitmanip\fP = \fI{0,1}\fP
+Subsume and strengthen implicit clauses with each other (default = 1).
+.TP
+\fB\-\-implsubsto\fP = <\fInum\fP>
+The timeout of implicit subsumption in mega-bogoprops (default = 1900).
+.TP
+\fB\-\-burst\fP = <\fInum\fP>
+The number of conflicts to do in burst search (default = 300).
+.TP
+\fB\-\-clearinter\fP = \fI{0,1}\fP
+Interrupt threads cleanly, all the time (default = 0).
+.TP
+\fB\-\-zero\-exit\-status\fP = \fI{0,1}\fP
+Exit with status zero in case the solving has finished without an issue.
+.SH "EXIT STATUS"
+.PP
+The output is a solution, together with some timing information.  If
+\-\-zero\-exit\-status has not been specified, then the exit status is as
+follows:
+.IP 10
+The problem is satisfiable.
+.IP 15
+The problem's satisfiability was not determined.
+.IP 20
+The problem is unsatisfiable.
+.SH AUTHOR
+Mate Soos (soos@srlabs.de)
+.SH "SEE ALSO"
+The DIMACS input format can be looked up here:
+
+http://www.satcompetition.org/2009/format-benchmarks2009.html

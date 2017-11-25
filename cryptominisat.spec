@@ -1,37 +1,44 @@
 Name:           cryptominisat
-Version:        2.9.11
-Release:        6%{?dist}
+Version:        5.0.1
+Release:        1%{?dist}
 Summary:        SAT solver
 
-# The Mersenne Twister implementation is BSD-licensed.
-# All other files are MIT-licensed.
-License:        MIT
-URL:            http://www.msoos.org/cryptominisat2/
+# Most of the code is MIT, but a few files are LGPLv2, which subsumes MIT
+License:        LGPLv2
+URL:            http://www.msoos.org/
 Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
+# Text is from the sources, therefore under the same copyright and license as
+# the code.  Man page formatting contributed by Jerry James.
+Source1:        cryptominisat5.1
 
+BuildRequires:  boost-devel
+BuildRequires:  chrpath
+BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  libtool
-BuildRequires:  mariadb-connector-c-devel
-BuildRequires:  perl-interpreter
+BuildRequires:  gperftools-devel
+BuildRequires:  m4ri-devel
+BuildRequires:  python2-devel
+BuildRequires:  swig
+BuildRequires:  tbb-devel
+BuildRequires:  vim-common
 BuildRequires:  zlib-devel
+
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
-CryptoMiniSat is a SAT solver that aims to become a premiere SAT solver
-with all the features and speed of successful SAT solvers, such as
-MiniSat and PrecoSat.  The long-term goals of CryptoMiniSat are to be an
-efficient sequential, parallel and distributed solver.  There are
-solvers that are good at one or the other, e.g. ManySat (parallel) or
-PSolver (distributed), but we wish to excel at all.
-
-CryptoMiniSat 2.5 won the SAT Race 2010 among 20 solvers submitted by
-researchers and industry.
+CryptoMiniSat is a modern, multi-threaded, feature-rich, simplifying SAT
+solver. Highlights:
+- Instance simplification at every point of the search (inprocessing)
+- Over 100 configurable parameters to tune to specific needs
+- Collection of statistical data to MySQL database + javascript-based
+  visualization of it
+- Clean C++ and python interfaces
 
 %package devel
 Summary:        Header files for developing with %{name}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires:       mariadb-connector-c-devel%{?_isa}
-Requires:       zlib-devel%{?_isa}
+Requires:       m4ri-devel%{?_isa}
+Requires:       tbb-devel%{?_isa}
 
 %description devel
 Header files for developing applications that use %{name}.
@@ -42,54 +49,88 @@ Summary:        Cryptominisat library
 %description libs
 The %{name} library.
 
+%package -n python2-%{name}
+Summary:        Python 2 interface to %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%{?python_provide:%python_provide python-%{name}}
+
+%description -n python2-%{name}
+Python 2 interface to %{name}.
+
 %prep
 %setup -q
 
-# Fix version number and output directory in library documentation
-sed -e 's/2\.6\.0/%{version}/' \
-    -e 's,/home/soos.*cryptominisat,'$PWD, \
-    -i Doxyfile
+# Don't override our compiler flags
+sed -i 's/-O3 -mtune=native/-DNDEBUG/' CMakeLists.txt
+if [ "%{_libdir}" = "%{_prefix}/lib64" ]; then
+  sed -i 's,${dir}/lib,&64,g' cmake/FindPkgMacros.cmake
+fi
 
-# Generate the configure script
-autoreconf -fi
+# Fix the python install
+sed -ri 's|install |&--root %{buildroot} |' python/CMakeLists.txt
 
 %build
-export CPPFLAGS="-DHAVE_MYSQL -DCMSAT_HAVE_MYSQL"
-export LDFLAGS="-L%{_libdir}/mariadb"
-export LIBS="-lmysqlclient"
-%configure --disable-static
-
-# Eliminate hardcoded rpaths
-sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
-    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
-    -i libtool
-
-make %{?_smp_mflags}
+%cmake
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
-# We don't want the libtool files
-rm -f %{buildroot}%{_libdir}/*.la
+# Install the man page
+mkdir -p %{buildroot}%{_mandir}/man1
+sed 's/@VERSION@/%{version}/' %{SOURCE1} > \
+    %{buildroot}%{_mandir}/man1/cryptominisat5.1
+touch -r %{SOURCE1} %{buildroot}%{_mandir}/man1/cryptominisat5.1
+
+# Move library files to where they should go
+if [ "%{_libdir}" = "%{_prefix}/lib64" ]; then
+  mkdir -p %{buildroot}%{_libdir}
+  mv %{buildroot}%{_prefix}/lib/lib%{name}* %{buildroot}%{_libdir}
+  mv %{buildroot}%{_prefix}/lib/cmake %{buildroot}%{_libdir}
+  sed -i 's|%{_prefix}/lib/|%{_libdir}/|' \
+      %{buildroot}%{_libdir}/cmake/cryptominisat5/*.cmake
+fi
+
+# Remove buildroot paths from cmake files
+sed -i 's|%{buildroot}||' %{buildroot}%{_libdir}/cmake/cryptominisat5/*.cmake
+
+# Remove rpaths
+chrpath -d %{buildroot}%{_bindir}/cryptominisat5
+chrpath -d %{buildroot}%{_bindir}/cryptominisat5_simple
+
+# Fix permissions
+chmod 0755 %{buildroot}%{python2_sitearch}/pycryptosat.so
 
 %post libs -p /sbin/ldconfig
 
 %postun libs -p /sbin/ldconfig
 
 %files
-%{_bindir}/%{name}
-%{_mandir}/man1/%{name}*
+%doc README.markdown
+%{_bindir}/cryptominisat5
+%{_bindir}/cryptominisat5_simple
+%{_mandir}/man1/cryptominisat5*
 
 %files devel
-%{_includedir}/cmsat/
-%{_libdir}/lib%{name}.so
+%{_includedir}/cryptominisat5/
+%{_libdir}/libcryptominisat5.so
+%{_libdir}/cmake/
 
 %files libs
-%doc AUTHORS NEWS README TODO
-%license LICENSE-MIT
-%{_libdir}/lib%{name}-%{version}.so
+%doc AUTHORS
+%license LICENSE-SCALMC
+%{_libdir}/libcryptominisat5.so.*
+
+%files -n python2-%{name}
+%doc python/README.rst
+%license python/LICENSE
+%{python2_sitearch}/pycryptosat*
 
 %changelog
+* Sat Nov 25 2017 Jerry James <loganjerry@gmail.com> - 5.0.1-1
+- Update to major version 5
+
 * Sat Sep 23 2017 Jerry James <loganjerry@gmail.com> - 2.9.11-6
 - Update the mariadb BR (bz 1493618)
 
