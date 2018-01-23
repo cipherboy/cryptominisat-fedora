@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        5.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        SAT solver
 
 # Most of the code is MIT, but a few files are LGPLv2, which subsumes MIT
@@ -128,6 +128,9 @@ chmod 0755 %{buildroot}%{python2_sitearch}/pycryptosat.so
 %{python2_sitearch}/pycryptosat*
 
 %changelog
+* Tue Jan 23 2018 Jonathan Wakely <jwakely@redhat.com> - 5.0.1-2
+- Rebuilt for Boost 1.66
+
 * Sat Nov 25 2017 Jerry James <loganjerry@gmail.com> - 5.0.1-1
 - Update to major version 5
 
