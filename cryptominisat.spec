@@ -1,6 +1,6 @@
 Name:           cryptominisat
 Version:        5.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        SAT solver
 
 # Most of the code is MIT, but a few files are LGPLv2, which subsumes MIT
@@ -128,6 +128,9 @@ chmod 0755 %{buildroot}%{python2_sitearch}/pycryptosat.so
 %{python2_sitearch}/pycryptosat*
 
 %changelog
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Tue Jan 23 2018 Jonathan Wakely <jwakely@redhat.com> - 5.0.1-2
 - Rebuilt for Boost 1.66
 
