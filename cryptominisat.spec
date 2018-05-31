@@ -1,6 +1,6 @@
 Name:           cryptominisat
-Version:        5.0.1
-Release:        3%{?dist}
+Version:        5.6.0
+Release:        1%{?dist}
 Summary:        SAT solver
 
 License:        MIT
@@ -8,18 +8,23 @@ URL:            http://www.msoos.org/
 Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
 # Text is from the sources, therefore under the same copyright and license as
 # the code.  Man page formatting contributed by Jerry James.
-Source1:        cryptominisat5.1
+# Source1:        cryptominisat5.1
 
+%define _unpackaged_files_terminate_build 0
+
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  boost-devel
+BuildRequires:  boost-program-options
 BuildRequires:  chrpath
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  gperftools-devel
+BuildRequires:  help2man
 BuildRequires:  m4ri-devel
-BuildRequires:  python2-devel
-BuildRequires:  swig
-BuildRequires:  tbb-devel
-BuildRequires:  vim-common
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+BuildRequires:  sqlite-devel
 BuildRequires:  zlib-devel
 
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -43,19 +48,19 @@ Requires:       tbb-devel%{?_isa}
 Header files for developing applications that use %{name}.
 
 %package libs
-Summary:        Cryptominisat library
+Summary:        CryptoMiniSat library
 
 %description libs
 The %{name} library.
 
-%package -n python2-%{name}
-Summary:        Python 2 interface to %{name}
+%package -n python3-%{name}
+Summary:        Python 3 interface to %{name}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %{?python_provide:%python_provide python-%{name}}
 
-%description -n python2-%{name}
-Python 2 interface to %{name}.
+%description -n python3-%{name}
+Python 3 interface to %{name}.
 
 %prep
 %setup -q
@@ -66,21 +71,26 @@ if [ "%{_libdir}" = "%{_prefix}/lib64" ]; then
   sed -i 's,${dir}/lib,&64,g' cmake/FindPkgMacros.cmake
 fi
 
-# Fix the python install
-sed -ri 's|install |&--root %{buildroot} |' python/CMakeLists.txt
+# Fix the python install for rpmbuild
+sed -i 's|install --prefix=${CMAKE_INSTALL_PREFIX} |install --root %{buildroot} |' python/CMakeLists.txt
 
 %build
-%cmake
+mkdir build
+cd build
+%cmake -DNOVALGRIND=ON -DUSE_GAUSS=ON -DNOZLIB=OFF -DSTATS=OFF ..
 %make_build
 
 %install
+cd build
 %make_install
 
-# Install the man page
-mkdir -p %{buildroot}%{_mandir}/man1
-sed 's/@VERSION@/%{version}/' %{SOURCE1} > \
-    %{buildroot}%{_mandir}/man1/cryptominisat5.1
-touch -r %{SOURCE1} %{buildroot}%{_mandir}/man1/cryptominisat5.1
+# Fix man page install
+mkdir -p %{buildroot}%{_mandir}
+mv %{buildroot}/usr/man/man1 %{buildroot}%{_mandir}/man1
+#mkdir -p %{buildroot}%{_mandir}/man1
+#sed 's/@VERSION@/%{version}/' %{SOURCE1} > \
+#    %{buildroot}%{_mandir}/man1/cryptominisat5.1
+#touch -r %{SOURCE1} %{buildroot}%{_mandir}/man1/cryptominisat5.1
 
 # Move library files to where they should go
 if [ "%{_libdir}" = "%{_prefix}/lib64" ]; then
@@ -99,7 +109,7 @@ chrpath -d %{buildroot}%{_bindir}/cryptominisat5
 chrpath -d %{buildroot}%{_bindir}/cryptominisat5_simple
 
 # Fix permissions
-chmod 0755 %{buildroot}%{python2_sitearch}/pycryptosat.so
+# chmod 0755 %{buildroot}%{python3_sitearch}/pycryptosat.so
 
 %post libs -p /sbin/ldconfig
 
@@ -112,19 +122,20 @@ chmod 0755 %{buildroot}%{python2_sitearch}/pycryptosat.so
 %{_mandir}/man1/cryptominisat5*
 
 %files devel
+%license LICENSE.txt
 %{_includedir}/cryptominisat5/
-%{_libdir}/libcryptominisat5.so
 %{_libdir}/cmake/
 
 %files libs
 %doc AUTHORS
-%license LICENSE-SCALMC
+%license LICENSE.txt
 %{_libdir}/libcryptominisat5.so.*
+%{_libdir}/libcryptominisat5.so
 
-%files -n python2-%{name}
+%files -n python3-%{name}
 %doc python/README.rst
 %license python/LICENSE
-%{python2_sitearch}/pycryptosat*
+%{python3_sitearch}/pycryptosat*
 
 %changelog
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-3
