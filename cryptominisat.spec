@@ -3,8 +3,7 @@ Version:        5.0.1
 Release:        3%{?dist}
 Summary:        SAT solver
 
-# Most of the code is MIT, but a few files are LGPLv2, which subsumes MIT
-License:        LGPLv2
+License:        MIT
 URL:            http://www.msoos.org/
 Source0:        https://github.com/msoos/%{name}/archive/%{version}.tar.gz
 # Text is from the sources, therefore under the same copyright and license as
